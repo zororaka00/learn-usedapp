@@ -5,31 +5,32 @@ import {
   useContractFunction,
   useEthers,
   useTransactions,
-  useCall
+  useCall,
+  Rinkeby
 } from '@usedapp/core';
 import { utils, Contract } from 'ethers';
 import TesAbi from './Tes_abi.json';
 
 function App() {
-  const { activateBrowserWallet, account } = useEthers();
-  const etherBalance = useEtherBalance(account);
+  const { activateBrowserWallet, chainId, account } = useEthers();
+  const etherBalance = useEtherBalance(account, { chainId });
   const { sendTransaction } = useSendTransaction();
   const { transactions } = useTransactions()
 
   const sendBNB = async () => {
-    await sendTransaction({ to: "0xa8bf3aC4f567384F2f44B4E7C6d11b7664749f35", value: utils.parseEther("0.001") });
+    await sendTransaction({ to: "0xa8bf3aC4f567384F2f44B4E7C6d11b7664749f35", value: utils.parseEther("0.001"), chainId });
   }
 
   // Interaction Contract
   const TesInterface = new utils.Interface(TesAbi)
-  const instance = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS as string, TesInterface);
+  const instance = new Contract(process.env.REACT_APP_CONTRACT_ADDRESS_BSC_TESTNET as string, TesInterface);
   const { state, send:Set } = useContractFunction(instance, "addNames", { transactionName: "Add Name", });
-  const { value:getindex, error:a } = useCall(account && process.env.REACT_APP_CONTRACT_ADDRESS as string && {
+  const { value:getindex, error:a } = useCall(account && process.env.REACT_APP_CONTRACT_ADDRESS_BSC_TESTNET as string && {
     contract: instance,
     method: "index",
     args: []
   }) ?? {};
-  const { value:getname, error:b } = useCall(account && process.env.REACT_APP_CONTRACT_ADDRESS as string && {
+  const { value:getname, error:b } = useCall(account && process.env.REACT_APP_CONTRACT_ADDRESS_BSC_TESTNET as string && {
     contract: instance,
     method: "names",
     args: [2]
@@ -53,7 +54,7 @@ function App() {
       <header className="App-header">
         {!account && <button onClick={() => activateBrowserWallet()}>Connect</button>}
         {account && <p>Account Address: {account}</p>}
-        {etherBalance && <p>Balance: {(Number(utils.formatUnits(etherBalance, 18))).toFixed(4)} BNB</p>}
+        {etherBalance && <p>Balance: {(Number(utils.formatUnits(etherBalance, 18))).toFixed(4)} {chainId == Rinkeby.chainId ? 'ETH' : 'BNB'}</p>}
         {account && <p><button onClick={sendBNB}>Send BNB</button></p>}
         {account && <p><button onClick={AddNames}>Add Names to Contract</button></p>}
         {account && <p><button onClick={GetData}>Get Data</button></p>}

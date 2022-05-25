@@ -5,13 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {
   DAppProvider,
+  Rinkeby,
   Config,
 } from '@usedapp/core';
 
 const config: Config = {
-  readOnlyChainId: Number(process.env.REACT_APP_CHAIN_ID),
+  readOnlyChainId: Rinkeby.chainId,
   readOnlyUrls: {
-    [process.env.REACT_APP_CHAIN_ID as string]: process.env.REACT_APP_RPC_URL as string,
+    [Rinkeby.chainId]: process.env.REACT_APP_RPC_URL_RINKEBY as string,
+    [process.env.REACT_APP_CHAIN_ID_BSC_TESTNET as string]: process.env.REACT_APP_RPC_URL_BSC_TESTNET as string
   },
 }
 
